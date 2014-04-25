@@ -5,13 +5,30 @@ findIndicesOfFeatureType <- function(type, featureVec) {
     grep(paste('-', type, '\\(\\)', sep=''), featureVec)
 }
 
+# for speed, read X_test and X_train into vectors using scan(), and turn it into a matrix
+readFeatureMatrix <- function(fname) {
+    matrix(scan(fname), ncol=max(features$index), byrow=TRUE)
+}
+
+# given the matrix in "data" and a data.frame "features" describing the columns we want and their
+# names, return a subset of "data" having only the desired columns and 
+extractAndNameFeatures <- function(data, desiredFeatures) {
+    ret <- data[,c(desiredFeatures$index)]
+    colnames(ret) <- c(desiredFeatures$name)
+    ret
+}
+
 # Read in feature names. The data in features.txt amount to the nonexistent column headers for the
 # files test/X_test.txt and train/X_train.txt
-features <- read.delim('features.txt', sep=' ', header=FALSE, col.names=c('index', 'feature'))
+features <- read.delim('features.txt', sep=' ', header=FALSE, 
+                col.names=c('index', 'name'),
+                colClasses=c("integer", "character"))
 
-# First we get row indices into the data.frame called "features", then we extract the *column*
-# indices associated with those features by reading the index column. As it happens, the value of
-# the index column in row i is always just i, so this can seem like an unnecessary level of
-# indirection, but this is more robust to changes in hypothetical future releases of this dataset.
-meanIndices <- features[ findIndicesOfFeatureType('mean', features$feature), ]$index
-stdIndices  <- features[ findIndicesOfFeatureType('std',  features$feature), ]$index
+meanFeatures <- features[ findIndicesOfFeatureType('mean', features$name), ]
+stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
+desiredFeatures <- rbind(meanFeatures, stdFeatures)
+
+# TODO. For further testing, use _head variants. 
+# TODO. rbind these directly or rm() them after rbinding, for memory
+X_test  <- extractAndNameFeatures(readFeatureMatrix('test/X_test.txt'),   desiredFeatures)
+X_train <- extractAndNameFeatures(readFeatureMatrix('train/X_train.txt'), desiredFeatures)
