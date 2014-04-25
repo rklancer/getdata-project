@@ -2,3 +2,5 @@
 */.DS_Store
 output/
 doc/
+.Rproj.user
+.Rhistory
