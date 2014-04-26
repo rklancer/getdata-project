@@ -8,27 +8,23 @@ findIndicesOfFeatureType <- function(type, featureVec) {
     grep(paste('-', type, '\\(\\)', sep=''), featureVec)
 }
 
-# for speed, read X_test and X_train into vectors using scan(), and turn it into a matrix
-readFeatureMatrix <- function(fname) {
-    matrix(scan(fname), ncol=max(features$index), byrow=TRUE)
+readRawData <- function(prefix, class) {
+    scan(file.path(class, paste(prefix, '_', class, '.txt', sep='')))
 }
 
 # Given the matrix in "data" and a data.frame "features" describing the columns we want and their
 # names, return a data.frame having only the desired columns from "data", named appropriately.
-extractAndNameFeatures <- function(data, desiredFeatures) {
-    ret <- data.table(data[,c(desiredFeatures$index)])
-    setnames(ret, c(desiredFeatures$name))
+readFeatures <- function(class, desiredFeatures) {
+    rawData <- matrix(readRawData('X', class), ncol=max(features$index), byrow=TRUE)
+    ret <- data.table(rawData[,desiredFeatures$index])
+    setnames(ret, desiredFeatures$name)
     ret
 }
 
-pathFor <- function(prefix, class) {
-    file.path(class, paste(prefix, '_', class, '_head', '.txt', sep=''))
-}
-
 read <- function(class) {
-    ret = extractAndNameFeatures(readFeatureMatrix(pathFor('X', class)), desiredFeatures)
-    ret[,subject      := scan(pathFor('subject', class))]
-    ret[,activityCode := scan(pathFor('y', class))]
+    ret = readFeatures(class, desiredFeatures)
+    ret[,subject      := readRawData('subject', class)]
+    ret[,activityCode := readRawData('y', class)]
     ret[,class        := as.factor(class)]
 }
 
@@ -42,4 +38,4 @@ meanFeatures <- features[ findIndicesOfFeatureType('mean', features$name), ]
 stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
 desiredFeatures <- rbind(meanFeatures, stdFeatures)
 
-X_head <- rbindlist(list(read('test'), read('train')))
+dat <- rbindlist(list(read('test'), read('train')))
