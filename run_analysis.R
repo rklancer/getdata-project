@@ -24,7 +24,6 @@ read <- function(class) {
     ret = readFeatures(class, desiredFeatures)
     ret[,subject      := readRawData('subject', class)]
     ret[,activityCode := readRawData('y', class)]
-    ret[,class        := as.factor(class)]
 }
 
 # Read in feature names. The data in features.txt amount to the nonexistent column headers for the
