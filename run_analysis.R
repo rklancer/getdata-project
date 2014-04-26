@@ -1,3 +1,4 @@
+library(data.table)
 library(dplyr)
 
 # Uses the consistent naming pattern found in the dataset to find features of a particular type,
@@ -15,8 +16,8 @@ readFeatureMatrix <- function(fname) {
 # Given the matrix in "data" and a data.frame "features" describing the columns we want and their
 # names, return a data.frame having only the desired columns from "data", named appropriately.
 extractAndNameFeatures <- function(data, desiredFeatures) {
-    ret <- data.frame(data[,c(desiredFeatures$index)])
-    names(ret) <- c(desiredFeatures$name)
+    ret <- data.table(data[,c(desiredFeatures$index)])
+    setnames(ret, c(desiredFeatures$name))
     ret
 }
 
@@ -25,12 +26,10 @@ pathFor <- function(prefix, class) {
 }
 
 read <- function(class) {
-    cbind(
-        subject      = scan(pathFor('subject', class)),
-        activityCode = scan(pathFor('y', class)),
-        class        = as.factor(class),
-        extractAndNameFeatures(readFeatureMatrix(pathFor('X', class)), desiredFeatures)
-    )
+    ret = extractAndNameFeatures(readFeatureMatrix(pathFor('X', class)), desiredFeatures)
+    ret[,subject      := scan(pathFor('subject', class))]
+    ret[,activityCode := scan(pathFor('y', class))]
+    ret[,class        := as.factor(class)]
 }
 
 # Read in feature names. The data in features.txt amount to the nonexistent column headers for the
@@ -43,5 +42,4 @@ meanFeatures <- features[ findIndicesOfFeatureType('mean', features$name), ]
 stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
 desiredFeatures <- rbind(meanFeatures, stdFeatures)
 
-X_head <- rbind(read('test'), read('train'))
-
+X_head <- rbindlist(list(read('test'), read('train')))
