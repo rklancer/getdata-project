@@ -49,6 +49,6 @@ activityLabels <- data.table(read.delim('activity_labels.txt', sep=' ', header=F
                     colClasses=c('numeric', 'factor')))
 
 dat <- merge(dat, activityLabels, by="activityCode")
-
+dat[,activityCode:=NULL]
 setkey(dat, subject, activityLabel)
 means <- dat[,lapply(.SD, mean), by=list(subject, activityLabel)]
