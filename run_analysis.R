@@ -11,16 +11,16 @@ readFeatureMatrix <- function(fname) {
 }
 
 # given the matrix in "data" and a data.frame "features" describing the columns we want and their
-# names, return a subset of "data" having only the desired columns and 
+# names, return a subset of "data" having only the desired columns and
 extractAndNameFeatures <- function(data, desiredFeatures) {
-    ret <- data[,c(desiredFeatures$index)]
-    colnames(ret) <- c(desiredFeatures$name)
+    ret <- data.frame(data[,c(desiredFeatures$index)])
+    names(ret) <- c(desiredFeatures$name)
     ret
 }
 
 # Read in feature names. The data in features.txt amount to the nonexistent column headers for the
 # files test/X_test.txt and train/X_train.txt
-features <- read.delim('features.txt', sep=' ', header=FALSE, 
+features <- read.delim('features.txt', sep=' ', header=FALSE,
                 col.names=c('index', 'name'),
                 colClasses=c("integer", "character"))
 
@@ -28,7 +28,6 @@ meanFeatures <- features[ findIndicesOfFeatureType('mean', features$name), ]
 stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
 desiredFeatures <- rbind(meanFeatures, stdFeatures)
 
-# TODO. For further testing, use _head variants. 
 # TODO. rbind these directly or rm() them after rbinding, for memory
-X_test  <- extractAndNameFeatures(readFeatureMatrix('test/X_test.txt'),   desiredFeatures)
-X_train <- extractAndNameFeatures(readFeatureMatrix('train/X_train.txt'), desiredFeatures)
+X_test_head  <- extractAndNameFeatures(readFeatureMatrix('test/X_test_head.txt'),   desiredFeatures)
+X_train_head <- extractAndNameFeatures(readFeatureMatrix('train/X_train_head.txt'), desiredFeatures)
