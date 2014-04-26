@@ -10,11 +10,17 @@ readFeatureMatrix <- function(fname) {
     matrix(scan(fname), ncol=max(features$index), byrow=TRUE)
 }
 
-# given the matrix in "data" and a data.frame "features" describing the columns we want and their
-# names, return a subset of "data" having only the desired columns and
+# Given the matrix in "data" and a data.frame "features" describing the columns we want and their
+# names, return a data.frame having only the desired columns from "data", named appropriately.
 extractAndNameFeatures <- function(data, desiredFeatures) {
     ret <- data.frame(data[,c(desiredFeatures$index)])
     names(ret) <- c(desiredFeatures$name)
+    ret
+}
+
+read <- function(type) {
+    ret <- extractAndNameFeatures(readFeatureMatrix(file.path(type, paste('X_', type, '_head.txt', sep=''))), desiredFeatures)
+    ret$type = as.factor(type)
     ret
 }
 
@@ -28,6 +34,4 @@ meanFeatures <- features[ findIndicesOfFeatureType('mean', features$name), ]
 stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
 desiredFeatures <- rbind(meanFeatures, stdFeatures)
 
-# TODO. rbind these directly or rm() them after rbinding, for memory
-X_test_head  <- extractAndNameFeatures(readFeatureMatrix('test/X_test_head.txt'),   desiredFeatures)
-X_train_head <- extractAndNameFeatures(readFeatureMatrix('train/X_train_head.txt'), desiredFeatures)
+X_head <- rbind(read('test'), read('train'))
