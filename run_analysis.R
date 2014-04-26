@@ -34,7 +34,13 @@ features <- read.delim('features.txt', sep=' ', header=FALSE,
 
 meanFeatures <- features[ findIndicesOfFeatureType('mean', features$name), ]
 stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
-desiredFeatures <- rbind(meanFeatures, stdFeatures)
+
+# interleave the rows of meanFeatures, stdFeatures
+# so that a feature derived from the mean of a signal is (hopefully) immediately followed
+# by a feature derived from the standard deviation of the same signal
+desiredFeatures <- features[0,]
+desiredFeatures[seq(1, by=2, length=dim(meanFeatures)[1]),] <- meanFeatures
+desiredFeatures[seq(2, by=2, length=dim(stdFeatures)[1]),]  <- stdFeatures
 
 dat <- rbindlist(list(read('test'), read('train')))
 
