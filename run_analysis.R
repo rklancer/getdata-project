@@ -39,3 +39,9 @@ stdFeatures  <- features[ findIndicesOfFeatureType('std', features$name), ]
 desiredFeatures <- rbind(meanFeatures, stdFeatures)
 
 dat <- rbindlist(list(read('test'), read('train')))
+
+activityLabels <- data.table(read.delim('activity_labels.txt', sep=' ', header=FALSE, 
+                    col.names=c('activityCode', 'activityLabel'), 
+                    colClasses=c('numeric', 'factor')))
+
+dat <- merge(dat, activityLabels, by="activityCode")
