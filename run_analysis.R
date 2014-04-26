@@ -1,5 +1,7 @@
 # Use data.table for speed!
 library(data.table)
+# For write.fwf
+library(gdata)
 
 #
 # Given a vector of feature names from the Human Activity Recognition dataset,
@@ -113,3 +115,46 @@ combinedData[,activityCode:=NULL]
 setkey(combinedData, subject, activityLabel)
 summarizedData <- combinedData[,lapply(.SD, mean),
                     by=list(subject, activityLabel)]
+
+
+# Step 5: Write out a pretty-printed CSV. We'll get a little tricky here and
+# use the gdata package's write.fwf to generate a valid CSV file with nicely
+# formatted columns. We happen to know that none of the output data needs to
+# be quoted, so we'll be daring and turn off quoting for better readability.
+
+# Lengths of the column names, so each column can be no wider than necessary.
+lengths <- sapply(names(summarizedData), nchar)
+
+# Special-case the activityLabel column, as it can have data that is wider
+# than the label.
+lengths[['activityLabel']] <- max(
+    sapply(
+        as.character(activityLabels$activityLabel),
+        nchar
+    )
+)
+
+# give each column a little breathing room
+lengths <- lengths + 2
+
+# write.fwf doesn't seem to have an option to make the header fixed-width, so
+# we'll do it ourselves.
+
+# First, a little helper so we avoid repeating ourselves:
+write <- function(data, append=FALSE) {
+    write.fwf(
+        data,
+        file='summarized_data.txt',
+        quote=FALSE,
+        colnames=FALSE,
+        sep=',',
+        width=lengths,
+        justify="right",
+        append=append
+    )
+}
+
+# Now, write the header as if it were data:
+write(data.frame(matrix(names(summarizedData), nrow=1)))
+# and append all the actual data
+write(summarizedData, append=TRUE)
