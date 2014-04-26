@@ -1,5 +1,4 @@
 library(data.table)
-library(dplyr)
 
 # Uses the consistent naming pattern found in the dataset to find features of a particular type,
 # such as "mean" or "std". The trick is that features representing a mean are named like "*-mean()*"
@@ -45,3 +44,6 @@ activityLabels <- data.table(read.delim('activity_labels.txt', sep=' ', header=F
                     colClasses=c('numeric', 'factor')))
 
 dat <- merge(dat, activityLabels, by="activityCode")
+
+setkey(dat, subject, activityLabel)
+means <- dat[,lapply(.SD, mean), by=list(subject, activityLabel)]
