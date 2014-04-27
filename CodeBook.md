@@ -69,6 +69,7 @@ summarizations; a weighted mean frequency is a slightly different concept.
 
 ## Description of Data Fields
 
+* Every feature is a real number in the range [-1, 1]
 * `-mean()` indicates the feature was computed by taking the mean of the underlying signal.
 * `-std()` indicates the feature was computed by computing the standard deviation of the underlying
 signal.
