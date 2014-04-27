@@ -55,13 +55,11 @@ mean or interquartile range) to the expanded set of signals. See the file `featu
 HAR dataset for more details, as I did not perform that analysis.
 
 Conceptually, the summarization task done here is:
+
 1. Combine the testing and training data.
-2. Eliminate all features except the 66 features that use the _mean_ or _standard deviation_
-   statistical summarization operator.
-3. Combine the activity and subject identifiers with the feature data, converting activity
-   identifiers to human-readable activity labels.
-4. Group together all rows having the same (activity, subject) pair, and for each (group, feature)
-   pair, calculate the mean value of the feature.
+2. Eliminate all features except the 66 features that use the _mean_ or _standard deviation_ statistical summarization operator.
+3. Combine the activity and subject identifiers with the feature data, converting activity identifiers to human-readable activity labels.
+4. Group together all rows having the same (activity, subject) pair, and for each (group, feature) pair, calculate the mean value of the feature.
 
 Note that one of the summarization types that can be found in the dataset is a weighted mean
 frequency. I did not include these data in the final summary, although they would be trivial to add.
@@ -78,10 +76,14 @@ signal.
 
 ### Identifying columns
 
-`subject`
+```
+subject
+```
 The human subject whose activities were being labeled. Coded as an integer in the range 1-30.
 
-`activityLabel`
+```
+activityLabel
+```
 Label describing the activity undertaken by the subject. One of "LAYING", "SITTING", "STANDING",
 "WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS".
 
@@ -171,7 +173,7 @@ tBodyGyroJerkMag-std()
 Magnitude of angular velocity,
 
 
-## Frequency-domain signals
+### Features derived from frequency-domain signals
 
 ```
 fBodyAcc-mean()-X
